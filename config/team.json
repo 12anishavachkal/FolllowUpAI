@@ -1,0 +1,10 @@
+{
+  "people": [
+    {"name": "Laura Meyer", "role": "UX Designer"},
+    {"name": "Laura Schmidt", "role": "Product Owner"},
+    {"name": "Arjun Rao", "role": "Project Manager"},
+    {"name": "Priya Nair", "role": "Data Analyst"},
+    {"name": "Tom Becker", "role": "Developer"}
+  ],
+  "roles": ["Project Manager", "UX Designer", "Data Analyst", "Developer", "Product Owner"]
+}
