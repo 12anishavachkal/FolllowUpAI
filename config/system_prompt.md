@@ -37,6 +37,9 @@ proposed or possible, NEVER confirmed.
   needs_clarification or error -> deadline_status "needs_clarification", deadline_date null;
   none -> deadline_status "none".
 - Never turn a vague phrase into a date yourself.
+- Only fill deadline_raw when the notes contain a time expression (a date, a day,
+  "next week", "end of June", "ASAP"). Never put other text there, such as "no owner
+  was selected". If the notes give no time, leave deadline_raw null.
 
 ## Evidence
 - supporting_text must be copied word for word from the notes. Never paraphrase it.

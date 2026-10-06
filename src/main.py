@@ -3,19 +3,25 @@
 import argparse
 import sys
 from datetime import date
+from pathlib import Path
 
 from src.analyze import AnalysisError, analyze_notes
+from src.config import load_settings, resolve_path
 from src.llm import LLMConfigError
+from src.review import ask_yes_no, review_items
+from src.tools.action_writer import ActionWriteError, save_approved_actions
 from src.tools.note_reader import NoteReadError, read_meeting_notes
 from src.tools.summary import render_summary
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Meeting follow-up agent (draft analysis).")
+    parser = argparse.ArgumentParser(description="Meeting follow-up agent.")
     parser.add_argument("notes_file", help="Path to a .txt or .md notes file")
     parser.add_argument("--date", default=date.today().isoformat(),
                         help="Meeting date YYYY-MM-DD (default: today)")
     parser.add_argument("--json", action="store_true", help="Also print the structured JSON")
+    parser.add_argument("--no-review", action="store_true",
+                        help="Only print the draft; skip the review and save steps")
     args = parser.parse_args()
 
     try:
@@ -34,6 +40,30 @@ def main() -> int:
     if args.json:
         print("\nSTRUCTURED JSON")
         print(analysis.model_dump_json(indent=2))
+
+    if args.no_review:
+        print("\nReview skipped (--no-review). Nothing was saved.")
+        return 0
+
+    counts = review_items(analysis.items, args.date)
+    print(f"\nReview finished: {counts['approved']} approved, "
+          f"{counts['rejected']} rejected, {counts['pending']} left pending.")
+    if counts["approved"] == 0:
+        print("Nothing to save.")
+        return 0
+
+    output_path = resolve_path(load_settings()["paths"]["output_file"])
+    if not ask_yes_no(input, f"Save {counts['approved']} approved item(s) to {output_path}? [Y/n]: ",
+                      default=True):
+        print("Not saved.")
+        return 0
+
+    try:
+        saved = save_approved_actions(analysis.items, str(output_path), Path(args.notes_file).name)
+    except ActionWriteError as exc:
+        print(f"Could not save: {exc}")
+        return 1
+    print(f"Saved {saved} approved item(s) to {output_path}.")
     return 0
 
 
