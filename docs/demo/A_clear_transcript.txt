@@ -1,0 +1,49 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20261007130412
+Username: ANISHA\Anisha Vachkal
+RunAs User: ANISHA\Anisha Vachkal
+Configuration Name: 
+Machine: ANISHA (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe -noexit -command try { . "c:\Users\Anisha Vachkal\AppData\Local\Programs\Microsoft VS Code\07f806f999\resources\app\out\vs\workbench\contrib\terminal\common\scripts\shellIntegration.ps1" } catch {}
+Process ID: 21904
+PSVersion: 5.1.26100.9549
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.9549
+BuildVersion: 10.0.26100.9549
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Transcript started, output file is docs\demo\A_clear_transcript.txt
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cAnisha Vachkal\x5cProjects\x5cFollowUpAIPS C:\Users\Anisha Vachkal\Projects\FollowUpAI> ]633;B
+(.venv) python -m src.main samples\clear_notes.md --date 2026-10-06
+
+REVIEW: 5 items to review (1 background item(s) not reviewed).
+Nothing is saved until you confirm at the end.
+
+--- Item 1 of 5 (confirmed_decision) ---
+  [item-1] Launch reporting view to internal users
+      The reporting view will be launched to internal users on 2026-11-02.
+      Owner: NOT ASSIGNED
+      Deadline: 2026-11-02 (notes say '2026-11-02')
+      Source: "We decided to launch the reporting view to internal users on 2026-11-02."
+[a] approve  [r] reject  [m] modify  [c] complete owner/deadline  [s] skip  [q] finish review
+> q
+
+Review finished: 0 approved, 0 rejected, 5 left pending.
+Nothing to save (only approved actions are saved).
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cAnisha Vachkal\x5cProjects\x5cFollowUpAIPS C:\Users\Anisha Vachkal\Projects\FollowUpAI> ]633;B
+(.venv) New-Item -ItemType File -Path docs\DEMO.md
+
+
+    Directory: C:\Users\Anisha Vachkal\Projects\FollowUpAI\docs
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----        07-10-2026     13:13              0 DEMO.md
+
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cAnisha Vachkal\x5cProjects\x5cFollowUpAIPS C:\Users\Anisha Vachkal\Projects\FollowUpAI> ]633;B

@@ -8,8 +8,9 @@ from pathlib import Path
 from src.analyze import AnalysisError, analyze_notes
 from src.config import load_settings, resolve_path
 from src.llm import LLMConfigError
+from src.models import ReviewStatus
 from src.review import ask_yes_no, review_items
-from src.tools.action_writer import ActionWriteError, save_approved_actions
+from src.tools.action_writer import ActionWriteError, save_approved_actions, saveable_types
 from src.tools.note_reader import NoteReadError, read_meeting_notes
 from src.tools.summary import render_summary
 
@@ -48,12 +49,20 @@ def main() -> int:
     counts = review_items(analysis.items, args.date)
     print(f"\nReview finished: {counts['approved']} approved, "
           f"{counts['rejected']} rejected, {counts['pending']} left pending.")
-    if counts["approved"] == 0:
+
+    allowed = saveable_types()
+    to_save = [i for i in analysis.items
+               if i.status == ReviewStatus.APPROVED and i.type.value in allowed]
+    not_saved = counts["approved"] - len(to_save)
+    if not_saved:
+        print(f"{not_saved} approved item(s) are not actions and will not be saved "
+              f"(saved types: {', '.join(sorted(allowed))}).")
+    if not to_save:
         print("Nothing to save.")
         return 0
 
     output_path = resolve_path(load_settings()["paths"]["output_file"])
-    if not ask_yes_no(input, f"Save {counts['approved']} approved item(s) to {output_path}? [Y/n]: ",
+    if not ask_yes_no(input, f"Save {len(to_save)} approved item(s) to {output_path}? [Y/n]: ",
                       default=True):
         print("Not saved.")
         return 0

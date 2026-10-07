@@ -1,4 +1,4 @@
-"""Tool: save ONLY human-approved items of the configured types to a local JSON file."""
+"""Tool: save ONLY human-approved action items to a local JSON file."""
 
 import json
 import os
@@ -6,31 +6,23 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from src.config import load_settings
-from src.models import ItemType, MeetingItem, ReviewStatus
+from src.models import MeetingItem, ReviewStatus
 
 
 class ActionWriteError(Exception):
     """Raised when approved items cannot be saved."""
 
 
-def saveable_types() -> set[str]:
-    """Item types that may be saved (config/settings.yaml, output.saveable_types).
-
-    If the setting is missing, every item type may be saved.
-    """
-    configured = (load_settings().get("output") or {}).get("saveable_types")
-    return set(configured) if configured else {t.value for t in ItemType}
-
-
 def save_approved_actions(items: list[MeetingItem], output_path: str, source_name: str) -> int:
-    """Append approved items of a saveable type to the JSON file; return how many were saved.
+    """Append approved action items to the JSON file and return how many were saved.
 
-    Items that are pending, rejected or of another type are filtered out here as a
-    second safety net, even if the caller already filtered them.
+    Two safety nets apply here, even if the caller already filtered:
+      * pending and rejected items are never written
+      * only item types listed in settings (saving.saveable_types) are written
     """
-    allowed = saveable_types()
+    saveable = set(load_settings()["saving"]["saveable_types"])
     approved = [i for i in items
-                if i.status == ReviewStatus.APPROVED and i.type.value in allowed]
+                if i.status == ReviewStatus.APPROVED and i.type.value in saveable]
     if not approved:
         return 0
 
