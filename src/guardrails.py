@@ -30,18 +30,28 @@ def _flag(item: MeetingItem, question: str) -> None:
         item.clarification_question += " " + question
 
 
-def _check_owner(item: MeetingItem, label: str, notes_vocab: set[str], log: list[str]) -> None:
+def _check_owner(item: MeetingItem, label: str, notes_flat: str,
+                 notes_vocab: set[str], log: list[str]) -> None:
     if not item.owner:
         return
     written = item.owner
+    phrase = _words(written)
 
-    if not any(token in notes_vocab for token in _words(written).split()):
-        item.owner = None
-        _flag(item, "Who is responsible for this? No owner is named in the notes.")
-        log.append(f"{label}: owner '{written}' does not appear in the notes; removed.")
-        return
+    # Use only the part of the owner that the notes really contain. If the notes
+    # say "Laura" and the model wrote "Laura Meyer", we validate "laura", so the
+    # validator sees both Lauras and the owner is NOT silently chosen by the model.
+    if f" {phrase}" in f" {notes_flat}":
+        checked = written
+    else:
+        in_notes = [t for t in phrase.split() if t in notes_vocab]
+        if not in_notes:
+            item.owner = None
+            _flag(item, "Who is responsible for this? No owner is named in the notes.")
+            log.append(f"{label}: owner '{written}' does not appear in the notes; removed.")
+            return
+        checked = " ".join(in_notes)
 
-    result = validate_person(written)
+    result = validate_person(checked)
     status = result["status"]
     if status == "found":
         canonical = result["matches"][0]["name"]
@@ -51,7 +61,7 @@ def _check_owner(item: MeetingItem, label: str, notes_vocab: set[str], log: list
     elif status == "ambiguous":
         names = ", ".join(m["name"] for m in result["matches"])
         item.owner = None
-        _flag(item, f"Which person is meant by '{written}'? Possible: {names}.")
+        _flag(item, f"Which person is meant by '{checked}'? Possible: {names}.")
         log.append(f"{label}: owner '{written}' matches several people; removed.")
     elif status == "role":
         _flag(item, f"'{written}' is a role, not a person. Who exactly is responsible?")
@@ -59,7 +69,6 @@ def _check_owner(item: MeetingItem, label: str, notes_vocab: set[str], log: list
     else:
         _flag(item, f"'{written}' is not in the team list. Please confirm the owner.")
         log.append(f"{label}: owner '{written}' is not in the team list; flagged.")
-
 
 def _set_no_deadline(item: MeetingItem) -> None:
     item.deadline_raw = None
@@ -124,7 +133,8 @@ def apply_guardrails(analysis: MeetingAnalysis, notes_text: str,
                         "Please check this item against the original notes.")
             log.append(f"{label}: supporting text is not word for word in the notes; flagged.")
 
-        _check_owner(item, label, notes_vocab, log)
+
+        _check_owner(item, label, notes_flat, notes_vocab, log)
         _check_deadline(item, label, notes_flat, meeting_date, log)
 
         if item.type == ItemType.CONFIRMED_ACTION and not item.owner:

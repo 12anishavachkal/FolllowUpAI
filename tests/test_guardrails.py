@@ -71,3 +71,32 @@ def test_confirmed_action_without_owner_asks_who_owns_it():
     item = run(make(owner=None))
     assert item.needs_clarification
     assert "own" in item.clarification_question.lower()
+
+def run_with_notes(item: MeetingItem, notes: str) -> MeetingItem:
+    analysis = MeetingAnalysis(summary="s", items=[item])
+    analysis, _ = apply_guardrails(analysis, notes, MEETING)
+    return analysis.items[0]
+
+
+def test_model_cannot_pick_one_of_two_lauras():
+    # Notes only say "Laura"; the model guesses the full name "Laura Meyer".
+    item = run(make(supporting_text="Laura suggested testing next month.",
+                    owner="Laura Meyer"))
+    assert item.owner is None
+    assert item.needs_clarification
+    assert "Laura Meyer" in item.clarification_question
+    assert "Laura Schmidt" in item.clarification_question
+
+
+def test_full_name_in_notes_is_accepted():
+    notes = "Laura Meyer will test the reporting view."
+    item = run_with_notes(make(supporting_text=notes, owner="Laura Meyer"), notes)
+    assert item.owner == "Laura Meyer"
+    assert not item.needs_clarification
+
+
+def test_role_in_plural_is_still_recognised_as_role():
+    notes = "The project managers will review the draft."
+    item = run_with_notes(make(supporting_text=notes, owner="Project Manager"), notes)
+    assert item.needs_clarification
+    assert "role" in item.clarification_question

@@ -28,6 +28,7 @@ plus small inline notes and temporary files created inside the tests.
 | 6 | Unknown person | Flagged, never silently trusted | Validator and guardrails agree |
 | 7 | Human approval | Pending, rejected and skipped items are never written; end of input approves nothing | The main safety promise |
 | 8 | Date validator | Only exact dates resolve; vague wording never does | Dates are the most error-prone part |
+| 9 | Two Lauras | Notes say only "Laura" but the model writes "Laura Meyer": the owner is removed and the user is asked which Laura is meant. A full name that is really in the notes is still accepted | The assignment's central trap: the model must not silently pick one of two people with the same first name |
 
 Deterministic parts (dates, people, guardrails, review, writer, files) are tested with ordinary
 unit tests. Model output varies, so live tests check rules and structure, not exact wording.
