@@ -1,4 +1,324 @@
-Observed: 6 items: 2 confirmed decisions, 3 confirmed actions (owners Tom Becker, Priya Nair, Arjun Rao;
-deadlines 2026-10-16, 2026-10-13, 2026-10-20, all resolved by the date tool) and 1 background item.
-0 of 6 items needed clarification. Review: all 5 reviewable items approved; the 3 actions were saved,
-the 2 decisions were not (only actions are saved).
+# Demonstration
+
+Agent: Project Meeting Follow-up Agent (PydanticAI + Gemini)
+Model used: `gemini-3.5-flash-lite` (pydantic-ai 2.54.0, Python 3.12.5)
+Meeting date used for all runs: `2026-10-06` (passed with `--date`)
+Recorded: 2026-10-08
+Setup: see the README. All meeting notes are synthetic and live in `samples/`.
+Paths in the recordings are shortened to `<project>\`.
+
+| # | Case | Notes file | Assignment requirement it covers |
+| --- | --- | --- | --- |
+| A | Clear notes, full approval and save | `clear_notes.md` | One successful interaction |
+| B | Ambiguous notes, human completes an item | `example_pdf.md` | One ambiguous or incomplete interaction |
+| C | Contradictory notes | `contradictory_notes.md` | Contradictory information |
+| D | Missing, empty and wrong-type file, bad model name | several | One failure scenario |
+
+---
+
+## A. Successful interaction (clear notes)
+
+Command: `python -m src.main samples\clear_notes.md --date 2026-10-06`
+
+What happened: All 5 reviewable items were approved. The 3 confirmed actions were saved with owners and exact dates. The 2 approved decisions were not saved, because only actions are saved. A mistyped (empty) key at item 3 was rejected with a prompt and the item was shown again.
+
+```
+PS> python -m src.main samples\clear_notes.md --date 2026-10-06
+MEETING FOLLOW-UP (DRAFT - nothing has been saved)
+============================================================
+Meeting: Weekly Project Sync - Reporting Module
+
+SUMMARY
+The team held a weekly project sync for the reporting module on October 6, 2026, confirming plans to launch the reporting view to internal users on November 2, 2026, while excluding external users in this release. Tasks were assigned to Tom Becker, Priya Nair, and Arjun Rao with specific deadlines.
+Topics: Reporting Module; Launch Planning; Bug Fixing; Project Data; Testing Invitations
+
+CONFIRMED DECISIONS (2)
+  [item-1] Launch reporting view to internal users
+      The reporting view will be launched to internal users on November 2, 2026.
+      Owner: NOT ASSIGNED
+      Deadline: 2026-11-02 (notes say '2026-11-02')
+      Source: "We decided to launch the reporting view to internal users on 2026-11-02."
+  [item-2] Exclude external users from initial release
+      External users will not receive access to the reporting view in this release.
+      Source: "The team agreed that external users will not get access in this release."
+
+CONFIRMED ACTIONS (3)
+  [item-3] Fix the export bug
+      Tom Becker is responsible for fixing the export bug by October 16, 2026.
+      Owner: Tom Becker
+      Deadline: 2026-10-16 (notes say '2026-10-16')
+      Source: "Tom Becker will fix the export bug by 2026-10-16."
+  [item-4] Prepare example project data
+      Priya Nair will prepare the example project data by October 13, 2026.
+      Owner: Priya Nair
+      Deadline: 2026-10-13 (notes say '2026-10-13')
+      Source: "Priya Nair will prepare the example project data by 2026-10-13."
+  [item-5] Send test invitation to project managers
+      Arjun Rao will send the test invitation to project managers by October 20, 2026.
+      Owner: Arjun Rao
+      Deadline: 2026-10-20 (notes say '2026-10-20')
+      Source: "Arjun Rao will send the test invitation to the project managers by 2026-10-20."
+
+BACKGROUND (1)
+  [item-6] Reporting view context
+      The new reporting view replaces the older spreadsheet reports.
+      Source: "The reporting view replaces the old spreadsheet reports."
+
+0 of 6 items need clarification.
+
+REVIEW: 5 items to review (1 background item(s) not reviewed).
+Nothing is saved until you confirm at the end.
+
+--- Item 1 of 5 (confirmed_decision) ---
+  [item-1] Launch reporting view to internal users
+      The reporting view will be launched to internal users on November 2, 2026.
+      Owner: NOT ASSIGNED
+      Deadline: 2026-11-02 (notes say '2026-11-02')
+      Source: "We decided to launch the reporting view to internal users on 2026-11-02."
+[a] approve  [r] reject  [m] modify  [c] complete owner/deadline  [s] skip  [q] finish review
+> a
+  -> approved
+
+--- Item 2 of 5 (confirmed_decision) ---
+  [item-2] Exclude external users from initial release
+      External users will not receive access to the reporting view in this release.
+      Source: "The team agreed that external users will not get access in this release."
+[a] approve  [r] reject  [m] modify  [c] complete owner/deadline  [s] skip  [q] finish review
+> a
+  -> approved
+
+--- Item 3 of 5 (confirmed_action) ---
+  [item-3] Fix the export bug
+      Tom Becker is responsible for fixing the export bug by October 16, 2026.
+      Owner: Tom Becker
+      Deadline: 2026-10-16 (notes say '2026-10-16')
+      Source: "Tom Becker will fix the export bug by 2026-10-16."
+[a] approve  [r] reject  [m] modify  [c] complete owner/deadline  [s] skip  [q] finish review
+> 
+  Please type a, r, m, c, s or q.
+
+--- Item 3 of 5 (confirmed_action) ---
+  [item-3] Fix the export bug
+      Tom Becker is responsible for fixing the export bug by October 16, 2026.
+      Owner: Tom Becker
+      Deadline: 2026-10-16 (notes say '2026-10-16')
+      Source: "Tom Becker will fix the export bug by 2026-10-16."
+[a] approve  [r] reject  [m] modify  [c] complete owner/deadline  [s] skip  [q] finish review
+> a
+  -> approved
+
+--- Item 4 of 5 (confirmed_action) ---
+  [item-4] Prepare example project data
+      Priya Nair will prepare the example project data by October 13, 2026.
+      Owner: Priya Nair
+      Deadline: 2026-10-13 (notes say '2026-10-13')
+      Source: "Priya Nair will prepare the example project data by 2026-10-13."
+[a] approve  [r] reject  [m] modify  [c] complete owner/deadline  [s] skip  [q] finish review
+> a
+  -> approved
+
+--- Item 5 of 5 (confirmed_action) ---
+  [item-5] Send test invitation to project managers
+      Arjun Rao will send the test invitation to project managers by October 20, 2026.
+      Owner: Arjun Rao
+      Deadline: 2026-10-20 (notes say '2026-10-20')
+      Source: "Arjun Rao will send the test invitation to the project managers by 2026-10-20."
+[a] approve  [r] reject  [m] modify  [c] complete owner/deadline  [s] skip  [q] finish review
+> a
+  -> approved
+
+Review finished: 5 approved, 0 rejected, 0 left pending.
+2 approved item(s) are not actions and will not be saved (saved types: confirmed_action, possible_action).
+Save 3 approved item(s) to <project>\output\approved_actions.json? [Y/n]: 
+Saved 3 approved item(s) to <project>\output\approved_actions.json.
+PS> Get-Content output\approved_actions.json
+[
+  {
+    "id": "item-3",
+    "type": "confirmed_action",
+    "title": "Fix the export bug",
+    "description": "Tom Becker is responsible for fixing the export bug by October 16, 2026.",
+    "owner": "Tom Becker",
+    "deadline_raw": "2026-10-16",
+    "deadline_date": "2026-10-16",
+    "deadline_status": "resolved",
+    "supporting_text": "Tom Becker will fix the export bug by 2026-10-16.",
+    "needs_clarification": false,
+    "clarification_question": null,
+    "status": "approved",
+    "was_modified": false,
+    "source_file": "clear_notes.md",
+    "saved_at": "2026-10-08T05:35:58.027403+00:00"
+  },
+  {
+    "id": "item-4",
+    "type": "confirmed_action",
+    "title": "Prepare example project data",
+    "description": "Priya Nair will prepare the example project data by October 13, 2026.",
+    "owner": "Priya Nair",
+    "deadline_raw": "2026-10-13",
+    "deadline_date": "2026-10-13",
+    "deadline_status": "resolved",
+    "supporting_text": "Priya Nair will prepare the example project data by 2026-10-13.",
+    "needs_clarification": false,
+    "clarification_question": null,
+    "status": "approved",
+    "was_modified": false,
+    "source_file": "clear_notes.md",
+    "saved_at": "2026-10-08T05:35:58.027403+00:00"
+  },
+  {
+    "id": "item-5",
+    "type": "confirmed_action",
+    "title": "Send test invitation to project managers",
+    "description": "Arjun Rao will send the test invitation to project managers by October 20, 2026.",
+    "owner": "Arjun Rao",
+    "deadline_raw": "2026-10-20",
+    "deadline_date": "2026-10-20",
+    "deadline_status": "resolved",
+    "supporting_text": "Arjun Rao will send the test invitation to the project managers by 2026-10-20.",
+    "needs_clarification": false,
+    "clarification_question": null,
+    "status": "approved",
+    "was_modified": false,
+    "source_file": "clear_notes.md",
+    "saved_at": "2026-10-08T05:35:58.027403+00:00"
+  }
+]
+```
+
+---
+
+## B. Ambiguous or incomplete interaction
+
+Command: `python -m src.main samples\example_pdf.md --date 2026-10-06 --json`
+
+What happened: The agent did not guess any owner and did not convert "next month" into a date. It flagged "Laura" as unclear (Laura Meyer or Laura Schmidt) and only offered the possible window 2026-11-01 to 2026-11-30. Approving the timing item while its question was open needed an extra confirmation, which the reviewer declined, then skipped the item. For the confirmed action "prepare example project data" (no owner in the notes), the reviewer typed "Laura" as the owner. The tool refused and listed both people, so the reviewer entered the full name "Priya Nair" and the exact date 2026-10-20, marked the question resolved, and approved. 1 action was saved. The other items stayed pending and were not saved.
+
+```
+PASTE THE CLEANED demo_B TRANSCRIPT HERE (you may replace the long JSON block with [JSON trimmed])
+```
+
+---
+
+## C. Contradictory information
+
+Command: `python -m src.main samples\contradictory_notes.md --date 2026-10-06 --no-review`
+
+What happened: Three contradictions (launch date, example-data deadline, external access) were listed. No side was chosen, and all 6 items were flagged for clarification. Nothing was saved, because review was skipped.
+
+```
+PS> python -m src.main samples\contradictory_notes.md --date 2026-10-06 --no-review
+MEETING FOLLOW-UP (DRAFT - nothing has been saved)
+============================================================
+Meeting: Planning Meeting - Reporting View Launch
+
+SUMMARY
+During the planning meeting for the reporting view launch, multiple contradictory statements were made regarding the launch date, the example project data deadline, and external user access. A launch date of 2026-11-02 was initially agreed upon, but a postponement to 2026-11-16 was proposed. Priya Nair was assigned to prepare example project data by 2026-10-13, with a suggestion to move it to 2026-10-20. Finally, a decision on external user access from day one conflicted with a later statement that they would not get access.
+Topics: Launch Date; Project Data Preparation; External User Access; Testing Status
+
+CONFIRMED DECISIONS (2)
+  [item-1] Launch date agreed for 2026-11-02
+      The team initially agreed that the launch will be on 2026-11-02.
+      Owner: NOT ASSIGNED
+      Deadline: 2026-11-02 (notes say '2026-11-02')
+      Source: "At the start of the meeting the team agreed that the launch will be on 2026-11-02."
+      [!] Clarify: Which launch date is correct: 2026-11-02 or 2026-11-16?
+  [item-5] External user access from day one
+      The team decided that external users will have access from day one.
+      Source: "We decided that external users will have access from day one."
+      [!] Clarify: Will external users have access from day one or not in this release?
+
+PROPOSED DECISIONS (not yet agreed) (3)
+  [item-2] Proposed launch date change to 2026-11-16
+      Laura Schmidt suggested moving the launch to 2026-11-16 because testing is not finished, but the change was not confirmed.
+      Owner: NOT ASSIGNED
+      Deadline: 2026-11-16 (notes say '2026-11-16')
+      Source: "Later, Laura Schmidt said the launch must move to 2026-11-16 because testing is not finished. Nobody confirmed the change."
+      [!] Clarify: Should the launch date be moved to 2026-11-16 as suggested by Laura Schmidt?
+  [item-4] Proposed deadline change for example project data
+      Arjun Rao suggested Priya prepare the data by 2026-10-20 instead because managers are away.
+      Owner: NOT ASSIGNED
+      Deadline: 2026-10-20 (notes say '2026-10-20')
+      Source: "Arjun Rao said Priya should prepare it by 2026-10-20 instead, because the managers are away."
+      [!] Clarify: Should the deadline for Priya Nair to prepare the example project data be moved to 2026-10-20?
+  [item-6] External user access exclusion proposed by Tom Becker
+      Tom Becker stated that external users will not get access in this release.
+      Source: "Later Tom Becker said that external users will not get access in this release."
+      [!] Clarify: Will external users get access in this release or be excluded as Tom Becker stated?
+
+CONFIRMED ACTIONS (1)
+  [item-3] Prepare example project data
+      Priya Nair will prepare the example project data by 2026-10-13.
+      Owner: Priya Nair
+      Deadline: 2026-10-13 (notes say '2026-10-13')
+      Source: "Priya Nair will prepare the example project data by 2026-10-13."
+      [!] Clarify: Which deadline should Priya Nair follow for preparing the example project data: 2026-10-13 or 2026-10-20?
+
+CONTRADICTIONS FOUND
+  - The meeting notes contradict each other regarding the launch date: the team initially agreed on 2026-11-02, but Laura Schmidt later proposed moving it to 2026-11-16.
+  - The meeting notes contradict each other regarding the example project data preparation deadline: it was stated that Priya Nair will prepare it by 2026-10-13, but Arjun Rao suggested 2026-10-20.
+  - The meeting notes contradict each other regarding external user access: the team decided external users will have access from day one, but Tom Becker later stated they will not get access in this release.
+
+6 of 6 items need clarification.
+
+Review skipped (--no-review). Nothing was saved.
+```
+
+---
+
+## D. Failure scenarios
+
+What happened: A missing file, an empty file and a wrong file type each gave a clear message and exit code 1, before any model call was made. A wrong model name (`not-a-real-model`, set for that one run only through the `LLM_MODEL` environment variable) gave an `Analysis failed` message with the 404 reason and exit code 1. Nothing was saved in any of these runs.
+
+```
+PS> python -m src.main samples\does_not_exist.md --date 2026-10-06
+Cannot read notes: File not found: samples\does_not_exist.md
+PS> $LASTEXITCODE
+1
+PS> python -m src.main samples\empty_notes.md --date 2026-10-06
+Cannot read notes: The notes file is empty.
+PS> $LASTEXITCODE
+1
+PS> python -m src.main samples\wrong_type.docx --date 2026-10-06
+Cannot read notes: Unsupported file type '.docx'. Allowed: .txt, .md
+PS> $LASTEXITCODE
+1
+PS> $env:LLM_MODEL = "not-a-real-model"
+PS> python -m src.main samples\clear_notes.md --date 2026-10-06
+Analysis failed: The model call failed (ModelHTTPError): status_code: 404, model_name: not-a-real-model, body: {'error': {'code': 404, 'message': 'models/not-a-real-model is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}
+PS> $LASTEXITCODE
+1
+PS> Remove-Item Env:LLM_MODEL
+```
+
+---
+
+## Agent decision flow
+
+1. The note reader checks the file type, size, encoding and emptiness. A bad file stops the run with a clear message (case D).
+2. The agent reads the notes and may call two tools: `check_deadline` (validates dates; vague wording such as "next month" is never turned into a date) and `check_person` (checks the team list, including the two Lauras).
+3. The model returns a typed `MeetingAnalysis`: topics, risks, owners, deadlines, contradictions and 8 item types (confirmed and proposed decisions, confirmed and possible actions, open questions, background, unclear).
+4. Guardrails re-check the model's answer in plain code: every quote must appear in the notes, an owner must appear in the notes and be unambiguous, dates are re-validated, and every item starts as pending. The model cannot approve anything.
+5. The user approves, rejects, modifies or completes each item. Approving an item that still has an open question needs a second confirmation. Nothing is approved automatically.
+6. Only approved actions are saved, after a final confirmation, to `output/approved_actions.json`.
+
+## What the demonstrations show
+
+- Decisions and actions are kept apart. Proposed decisions are labelled "not yet agreed" (B, C).
+- Owners and deadlines are never invented: "NOT ASSIGNED", "UNCLEAR" and "none mentioned" are shown instead (B).
+- Laura is not assigned automatically. The reviewer has to name a specific person (B).
+- Every item shows its original supporting text from the notes (A, B, C).
+- Contradictions are listed, not resolved (C).
+- Only approved actions are saved (A, B). Decisions and open questions are never saved.
+- File and model failures end with a clear message and exit code 1 (D).
+
+## Possible improvements
+
+- A fictional project-information search tool (currently a known limitation).
+- A web or UI review screen instead of the terminal.
+- CSV export and a merge across several meetings.
+- A cleaner alert when the model's output keeps failing validation.
+- A larger set of synthetic test notes in more formats.
+- The action writer appends on every run, so repeating a run creates duplicate records. It should skip duplicates.
+- Editing a deadline during review does not update a date written in the description text. Owner edits already do.
