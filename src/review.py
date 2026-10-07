@@ -4,6 +4,7 @@ Nothing is saved here. The caller saves only APPROVED items after a final confir
 `ask` and `show` can be replaced (for example in tests) so no real typing is needed.
 """
 
+import re
 from datetime import date
 from typing import Callable
 
@@ -70,6 +71,29 @@ def _edit_owner(item: MeetingItem, ask: Ask, show: Show) -> None:
             item.owner = text
             return
 
+def _rename_in(text: str, old: str, new: str) -> str:
+    """Replace the old owner's full name, or else their first name, with the new owner."""
+    full = re.sub(rf"\b{re.escape(old)}\b", new, text)
+    if full != text:
+        return full
+    first = old.split()[0]
+    return re.sub(rf"\b{re.escape(first)}\b", new, text)
+
+
+def _sync_owner_text(item: MeetingItem, old_owner: str | None, show: Show) -> None:
+    """After an owner change, stop the title and description naming the old owner.
+
+    supporting_text is never touched: it is the original quote from the notes.
+    """
+    if not old_owner or not item.owner or old_owner == item.owner:
+        return
+    for field in ("title", "description"):
+        before = getattr(item, field)
+        after = _rename_in(before, old_owner, item.owner)
+        if after != before:
+            setattr(item, field, after)
+            show(f"  {field.capitalize()} updated: {old_owner} -> {item.owner}.")
+
 
 def _edit_deadline(item: MeetingItem, meeting_date: str, ask: Ask, show: Show) -> None:
     """Let the user set an exact deadline. Vague wording is refused."""
@@ -110,9 +134,11 @@ def _after_edit(item: MeetingItem, before: tuple, ask: Ask) -> None:
 
 def _modify(item: MeetingItem, meeting_date: str, ask: Ask, show: Show) -> None:
     before = _snapshot(item)
+    old_owner = item.owner
     _edit_text(item, "title", "Title", ask)
     _edit_text(item, "description", "Description", ask)
     _edit_owner(item, ask, show)
+    _sync_owner_text(item, old_owner, show)
     _edit_deadline(item, meeting_date, ask, show)
     _after_edit(item, before, ask)
 

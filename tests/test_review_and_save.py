@@ -93,3 +93,19 @@ def test_only_action_types_are_saved(tmp_path):
     out = tmp_path / "out.json"
     assert save_approved_actions(items, str(out), "t.md") == 1
     assert saved_titles(out) == {"An action"}
+
+def test_changing_owner_updates_old_name_in_description_but_not_quote():
+    item = MeetingItem(id="item-1", type="confirmed_action",
+                       title="Tom Becker writes report",
+                       description="Tom Becker will write the report.",
+                       supporting_text="Tom will write the report.",
+                       owner="Tom Becker")
+    # m = modify; Enter keeps title and description; new owner 'Priya'; Enter keeps
+    # the deadline; r = reject to leave the item.
+    ask = scripted("m", "", "", "Priya", "", "r")
+    review_items([item], "2026-10-06", ask=ask, show=lambda _: None)
+
+    assert item.owner == "Priya Nair"
+    assert "Tom" not in item.title and "Tom" not in item.description
+    assert "Priya Nair" in item.description
+    assert item.supporting_text == "Tom will write the report."  # original quote kept
