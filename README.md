@@ -110,7 +110,7 @@ src/           main.py, analyze.py, agent.py, guardrails.py, review.py, models.p
 src/tools/     note_reader.py, date_validator.py, person_validator.py, action_writer.py, summary.py
 samples/       synthetic meeting notes
 tests/         test_*.py (pytest) and check_*.py (manual smoke scripts)
-docs/          DEMO.md, TESTS.md, demo/ (screenshots)
+docs/          DEMO.md, TESTS.md
 output/        approved_actions.json is created here (git-ignored)
 ```
 
