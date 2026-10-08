@@ -193,10 +193,212 @@ PS> Get-Content output\approved_actions.json
 
 Command: `python -m src.main samples\example_pdf.md --date 2026-10-06 --json`
 
-What happened: The agent did not guess any owner and did not convert "next month" into a date. It flagged "Laura" as unclear (Laura Meyer or Laura Schmidt) and only offered the possible window 2026-11-01 to 2026-11-30. Approving the timing item while its question was open needed an extra confirmation, which the reviewer declined, then skipped the item. For the confirmed action "prepare example project data" (no owner in the notes), the reviewer typed "Laura" as the owner. The tool refused and listed both people, so the reviewer entered the full name "Priya Nair" and the exact date 2026-10-20, marked the question resolved, and approved. 1 action was saved. The other items stayed pending and were not saved.
+What happened: The agent did not guess any owner and did not convert "next month" into a date. It flagged "Laura" as unclear and only offered the possible window 2026-11-01 to 2026-11-30, and 3 of the 4 items were marked as needing clarification. Approving the timing item (item 2) while its question was open needed an extra confirmation ("Approve anyway?"), which the reviewer declined, then skipped the item. For the confirmed action "Prepare example project data" (no owner in the notes), the reviewer edited the item and typed "Laura" as the owner. The tool refused and listed both people (Laura Meyer, Laura Schmidt), so the reviewer entered the full name "Priya Nair" and the exact date 2026-10-20, marked the open question resolved, and approved the item. 1 action was saved. The other 3 items stayed pending and were not saved.
+
+How this recording was made: the review answers were piped into the program from a list, so the run is repeatable. Because of this, the answers are not echoed on screen, and each prompt is followed directly by its result. The answers, in order, were:
+
+| Item | Answers |
+| --- | --- |
+| 1. Test with project managers | `s` (skip) |
+| 2. Timing of the first test | `a` (approve), `n` (decline "Approve anyway?"), `s` (skip) |
+| 3. Prepare example project data | `m` (modify), Enter (keep title), new description, `Laura` (refused), `Priya Nair`, `2026-10-20`, `y` (question resolved), `a` (approve) |
+| 4. External user access | `s` (skip) |
+| Save prompt | Enter (yes) |
+
+The saved record at the end comes from an identical repeat of the same scripted review. Only its `saved_at` timestamp differs.
 
 ```
-PASTE THE CLEANED demo_B TRANSCRIPT HERE (you may replace the long JSON block with [JSON trimmed])
+PS> "s","a","n","s","m","","Prepare the example project data.","Laura","Priya Nair","2026-10-20","y","a","s","" | python -m src.main samples\example_pdf.md --date 2026-10-06 --json
+MEETING FOLLOW-UP (DRAFT - nothing has been saved)
+============================================================
+Meeting: Reporting View Meeting
+
+SUMMARY
+The team discussed testing the new reporting view with project managers and agreed to prepare example project data without assigning an owner. A suggestion was made to test next month, and a decision on external user access remains open.
+Topics: Reporting view; Testing; Project data; External access
+
+PROPOSED DECISIONS (not yet agreed) (2)
+  [item-1] Test new reporting view with project managers
+      The new reporting view should probably be tested with the project managers.
+      Source: "The new reporting view should probably be tested with the project managers."
+  [item-2] Timing of the first test
+      Laura suggested that the first test could happen next month.
+      Owner: NOT ASSIGNED
+      Deadline: UNCLEAR (notes say 'next month')
+      Source: "Laura suggested that the first test could happen next month."
+      [!] Clarify: Which Laura should be associated with this suggestion? What is the exact deadline for 'next month'? It could fall between 2026-11-01 and 2026-11-30.
+
+CONFIRMED ACTIONS (1)
+  [item-3] Prepare example project data
+      The team agreed to prepare example project data, but no owner was selected.
+      Owner: NOT ASSIGNED
+      Deadline: none mentioned
+      Source: "The team agreed to prepare example project data, but no owner was selected."
+      [!] Clarify: Who is responsible for preparing the example project data? Who should own this action?
+
+OPEN QUESTIONS (1)
+  [item-4] External user access decision
+      The team must still decide whether external users should have access.
+      Source: "We must still decide whether external users should have access."
+      [!] Clarify: Should external users have access to the reporting view?
+
+3 of 4 items need clarification.
+
+STRUCTURED JSON
+{
+  "meeting_title": "Reporting View Meeting",
+  "topics": [
+    "Reporting view",
+    "Testing",
+    "Project data",
+    "External access"
+  ],
+  "summary": "The team discussed testing the new reporting view with project managers and agreed to prepare example project data without assigning an owner. A suggestion was made to test next month, and a decision on external user access remains open.",
+  "items": [
+    {
+      "id": "item-1",
+      "type": "proposed_decision",
+      "title": "Test new reporting view with project managers",
+      "description": "The new reporting view should probably be tested with the project managers.",
+      "owner": null,
+      "deadline_raw": null,
+      "deadline_date": null,
+      "deadline_status": "none",
+      "supporting_text": "The new reporting view should probably be tested with the project managers.",
+      "needs_clarification": false,
+      "clarification_question": null,
+      "status": "pending",
+      "was_modified": false
+    },
+    {
+      "id": "item-2",
+      "type": "proposed_decision",
+      "title": "Timing of the first test",
+      "description": "Laura suggested that the first test could happen next month.",
+      "owner": null,
+      "deadline_raw": "next month",
+      "deadline_date": null,
+      "deadline_status": "needs_clarification",
+      "supporting_text": "Laura suggested that the first test could happen next month.",
+      "needs_clarification": true,
+      "clarification_question": "Which Laura should be associated with this suggestion? What is the exact deadline for 'next month'? It could fall between 2026-11-01 and 2026-11-30.",
+      "status": "pending",
+      "was_modified": false
+    },
+    {
+      "id": "item-3",
+      "type": "confirmed_action",
+      "title": "Prepare example project data",
+      "description": "The team agreed to prepare example project data, but no owner was selected.",
+      "owner": null,
+      "deadline_raw": null,
+      "deadline_date": null,
+      "deadline_status": "none",
+      "supporting_text": "The team agreed to prepare example project data, but no owner was selected.",
+      "needs_clarification": true,
+      "clarification_question": "Who is responsible for preparing the example project data? Who should own this action?",
+      "status": "pending",
+      "was_modified": false
+    },
+    {
+      "id": "item-4",
+      "type": "open_question",
+      "title": "External user access decision",
+      "description": "The team must still decide whether external users should have access.",
+      "owner": null,
+      "deadline_raw": null,
+      "deadline_date": null,
+      "deadline_status": "none",
+      "supporting_text": "We must still decide whether external users should have access.",
+      "needs_clarification": true,
+      "clarification_question": "Should external users have access to the reporting view?",
+      "status": "pending",
+      "was_modified": false
+    }
+  ],
+  "contradictions": []
+}
+
+REVIEW: 4 items to review.
+Nothing is saved until you confirm at the end.
+
+--- Item 1 of 4 (proposed_decision) ---
+  [item-1] Test new reporting view with project managers
+      The new reporting view should probably be tested with the project managers.
+      Source: "The new reporting view should probably be tested with the project managers."
+[a] approve  [r] reject  [m] modify  [c] complete owner/deadline  [s] skip  [q] finish review
+>   -> skipped (stays pending and will not be saved)
+
+--- Item 2 of 4 (proposed_decision) ---
+  [item-2] Timing of the first test
+      Laura suggested that the first test could happen next month.
+      Owner: NOT ASSIGNED
+      Deadline: UNCLEAR (notes say 'next month')
+      Source: "Laura suggested that the first test could happen next month."
+      [!] Clarify: Which Laura should be associated with this suggestion? What is the exact deadline for 'next month'? It could fall between 2026-11-01 and 2026-11-30.
+[a] approve  [r] reject  [m] modify  [c] complete owner/deadline  [s] skip  [q] finish review
+>   This item still has an open question. Approve anyway? [y/N]: 
+--- Item 2 of 4 (proposed_decision) ---
+  [item-2] Timing of the first test
+      Laura suggested that the first test could happen next month.
+      Owner: NOT ASSIGNED
+      Deadline: UNCLEAR (notes say 'next month')
+      Source: "Laura suggested that the first test could happen next month."
+      [!] Clarify: Which Laura should be associated with this suggestion? What is the exact deadline for 'next month'? It could fall between 2026-11-01 and 2026-11-30.
+[a] approve  [r] reject  [m] modify  [c] complete owner/deadline  [s] skip  [q] finish review
+>   -> skipped (stays pending and will not be saved)
+
+--- Item 3 of 4 (confirmed_action) ---
+  [item-3] Prepare example project data
+      The team agreed to prepare example project data, but no owner was selected.
+      Owner: NOT ASSIGNED
+      Deadline: none mentioned
+      Source: "The team agreed to prepare example project data, but no owner was selected."
+      [!] Clarify: Who is responsible for preparing the example project data? Who should own this action?
+[a] approve  [r] reject  [m] modify  [c] complete owner/deadline  [s] skip  [q] finish review
+>   Title [Prepare example project data] (Enter = keep):   Description [The team agreed to prepare example project data, but no owner was selected.] (Enter = keep):   Owner [none] (Enter = keep, - = clear):   Several people match: Laura Meyer, Laura Schmidt. Please type the full name.
+  Owner [none] (Enter = keep, - = clear):   Owner set to Priya Nair.
+  Deadline [none] (Enter = keep, - = clear, or an exact date such as 2026-11-15):   Deadline set to 2026-10-20.
+  Mark the open question as resolved? [y/N]: 
+--- Item 3 of 4 (confirmed_action) ---
+  [item-3] Prepare example project data
+      Prepare the example project data.
+      Owner: Priya Nair
+      Deadline: 2026-10-20 (notes say '2026-10-20')
+      Source: "The team agreed to prepare example project data, but no owner was selected."
+[a] approve  [r] reject  [m] modify  [c] complete owner/deadline  [s] skip  [q] finish review
+>   -> approved
+
+--- Item 4 of 4 (open_question) ---
+  [item-4] External user access decision
+      The team must still decide whether external users should have access.
+      Source: "We must still decide whether external users should have access."
+      [!] Clarify: Should external users have access to the reporting view?
+[a] approve  [r] reject  [m] modify  [c] complete owner/deadline  [s] skip  [q] finish review
+>   -> skipped (stays pending and will not be saved)
+
+Review finished: 1 approved, 0 rejected, 3 left pending.
+Save 1 approved item(s) to <project>\output\approved_actions.json? [Y/n]: Saved 1 approved item(s) to <project>\output\approved_actions.json.
+PS> Get-Content output\approved_actions.json
+[
+  {
+    "id": "item-3",
+    "type": "confirmed_action",
+    "title": "Prepare example project data",
+    "description": "Prepare the example project data.",
+    "owner": "Priya Nair",
+    "deadline_raw": "2026-10-20",
+    "deadline_date": "2026-10-20",
+    "deadline_status": "resolved",
+    "supporting_text": "The team agreed to prepare example project data, but no owner was selected.",
+    "needs_clarification": false,
+    "clarification_question": null,
+    "status": "approved",
+    "was_modified": true,
+    "source_file": "example_pdf.md",
+    "saved_at": "2026-10-08T15:22:06.370542+00:00"
+  }
+]
 ```
 
 ---
