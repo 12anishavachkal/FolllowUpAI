@@ -37,6 +37,7 @@ The agent reads fictional meeting notes and prepares a draft follow-up package:
 
 Design principle: a small, well-tested solution. One agent, two tools, three safety layers, two human approval points.
 It is deliberately not a multi-agent system.
+Only the deadline and person validators are registered as agent tools. Reading the notes file and saving approved actions are plain Python on purpose, so the model can never read or write files by itself.
 
 ## 3. How it works
 
@@ -119,6 +120,8 @@ output/        approved_actions.json is created here (git-ignored)
 - The model can still misread language. The guardrails catch ambiguous or unknown people, invented quotes and
   bad dates, but they cannot tell that "Tom suggested it" does not make Tom the owner. The human review exists for this.
 - English text notes only, one file per run, JSON output only.
+- The action writer appends on every run, so running the same notes twice saves duplicate records.
+- Editing a deadline during review does not update a date mentioned in the description (owner edits do).
 - The team list is fictional and small. There is no project-information search tool.
 - The review is a terminal interface.
 - Model availability and load change: a model name can be retired and a busy service returns errors. Busy
@@ -140,7 +143,6 @@ output/        approved_actions.json is created here (git-ignored)
   debug the code, the tests and the documentation, and to walk through each setup step. I ran every command, checked
   the results myself and fixed problems that came up (for example a retired model name, an overloaded model service
   and empty files).
-- <fill in: any other AI tools you used, for example an editor assistant, and what you used them for>
 - Gemini is the model inside the product itself. It receives only synthetic notes.
 
 ## 11. Demonstration and further documents

@@ -30,7 +30,7 @@ open questions are reviewed, but only actions are written to the output file.
 - 39 automatic tests without the model: dates, people, guardrails (fed deliberately wrong "model output"),
   the review loop with scripted answers, saving, and file failures including the command-line exit code.
 - 3 live tests with the real model that check rules, not exact wording. They passed.
-- Manual demonstrations with screenshots: clear notes, the assignment's ambiguous example, contradictory notes,
+- Manual demonstrations with recorded terminal output (docs/DEMO.md): clear notes, the assignment's ambiguous example, contradictory notes,
   and several failures (missing, empty and wrong-type files, a wrong model name, a busy service).
 
 ## What should change before production?
