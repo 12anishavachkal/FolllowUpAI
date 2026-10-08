@@ -493,6 +493,20 @@ PS> $LASTEXITCODE
 1
 PS> Remove-Item Env:LLM_MODEL
 ```
+---
+
+## E. Busy service (simulated)
+
+========= test session starts ==========
+platform win32 -- Python 3.12.5, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Users\Anisha Vachkal\Projects\FollowUpAI
+configfile: pytest.ini
+plugins: anyio-4.15.1, logfire-5.1.1, platformdirs-4.12.3
+collected 3 items                       
+
+tests\test_retry.py ...           [100%]
+
+========== 3 passed in 5.57s ===========
 
 ---
 

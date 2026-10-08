@@ -1,4 +1,4 @@
-# FolllowUpAI
+# FollowUpAI
 
 # Project Meeting Follow-up Agent: recruitment assignment
 
@@ -33,7 +33,7 @@ The agent reads fictional meeting notes and prepares a draft follow-up package:
 | Google Gemini (model set in `.env`) | Available with a free tier |
 | Pydantic models | The output has a defined shape; owners and deadlines are optional so they are never forced |
 | python-dotenv, PyYAML | Secrets in `.env`, settings in `config/settings.yaml`, rules in `config/system_prompt.md` |
-| pytest | 39 fast tests without the model, plus 3 optional live tests |
+| pytest | 43 fast tests without the model, plus 3 optional live tests |
 
 Design principle: a small, well-tested solution. One agent, two tools, three safety layers, two human approval points.
 It is deliberately not a multi-agent system.
@@ -56,6 +56,8 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the diagram and details.
 Requirements: Python 3.12, Git, and a Gemini API key from Google AI Studio (aistudio.google.com).
 Tested with Python 3.12.5.
 
+Developed and tested with gemini-3.5-flash-lite
+
 ```
 git clone https://github.com/12anishavachkal/FolllowUpAI.git
 cd FolllowUpAI
@@ -63,6 +65,7 @@ python -m venv .venv
 .venv\Scripts\Activate.ps1        # macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
 Copy-Item .env.example .env       # macOS/Linux: cp .env.example .env
+
 ```
 
 Open `.env` and set your own values (never commit this file):
@@ -97,7 +100,7 @@ Sample notes are in `samples/`: `clear_notes.md`, `example_pdf.md` (the assignme
 ## 6. Tests
 
 ```
-python -m pytest                  # 39 tests, no API calls
+python -m pytest                  # 43 tests, no API calls
 $env:RUN_LLM_TESTS = "1"          # enable the 3 live-model tests (they call Gemini)
 python -m pytest tests\test_llm_live.py
 ```

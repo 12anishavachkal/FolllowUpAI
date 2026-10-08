@@ -27,7 +27,7 @@ open questions are reviewed, but only actions are written to the output file.
 - Very long notes or subtle wording such as "we'll probably".
 
 ## How was behaviour verified?
-- 39 automatic tests without the model: dates, people, guardrails (fed deliberately wrong "model output"),
+- 43 automatic tests without the model: dates, people, guardrails (fed deliberately wrong "model output"),
   the review loop with scripted answers, saving, and file failures including the command-line exit code.
 - 3 live tests with the real model that check rules, not exact wording. They passed.
 - Manual demonstrations with recorded terminal output (docs/DEMO.md): clear notes, the assignment's ambiguous example, contradictory notes,
