@@ -54,6 +54,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the diagram and details.
 ## 4. Setup
 
 Requirements: Python 3.12, Git, and a Gemini API key from Google AI Studio (aistudio.google.com).
+Tested with Python 3.12.5.
 
 ```
 git clone https://github.com/12anishavachkal/FolllowUpAI.git
