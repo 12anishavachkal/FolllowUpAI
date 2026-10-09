@@ -2,8 +2,8 @@
 
 Agent: Project Meeting Follow-up Agent (PydanticAI + Gemini)
 Model used: `gemini-3.5-flash-lite` (pydantic-ai 2.54.0, Python 3.12.5)
-Meeting date used for all runs: `2026-10-06` (passed with `--date`)Recorded: 2026-10-09
-Recorded: 2026-10-08
+Meeting date used for all runs: `2026-10-06` (passed with `--date`)
+Recorded: 2026-10-08 and 2026-10-09
 Setup: see the README. All meeting notes are synthetic and live in `samples/`.
 Paths in the recordings are shortened to `<project>\`.
 
@@ -13,6 +13,7 @@ Paths in the recordings are shortened to `<project>\`.
 | B | Ambiguous notes, human completes an item | `example_pdf.md` | One ambiguous or incomplete interaction |
 | C | Contradictory notes | `contradictory_notes.md` | Contradictory information |
 | D | Missing, empty and wrong-type file, bad model name | several | One failure scenario |
+| E | Busy service (simulated with tests) | `tests\test_retry.py` | Technical failure with automatic retry |
 | F | Approving over an open question | `example_pdf.md` | Human approval with a recorded reason |
 
 ---
@@ -494,20 +495,29 @@ PS> $LASTEXITCODE
 1
 PS> Remove-Item Env:LLM_MODEL
 ```
+
 ---
 
 ## E. Busy service (simulated)
 
+Command: `python -m pytest tests\test_retry.py`
+
+What happened: The model service cannot be made busy on demand, so the busy-service behaviour is simulated with a fake agent. A busy response (HTTP 503) is retried automatically with increasing waits (5, 10 and 20 seconds, 4 attempts in total). After the last attempt the user gets a clear message. A wrong model name (HTTP 404) is not retried and fails immediately. The waiting time is switched off inside the tests, so they run in a few seconds.
+
+```
 ========= test session starts ==========
 platform win32 -- Python 3.12.5, pytest-9.1.1, pluggy-1.6.0
-rootdir: C:\Users\Anisha Vachkal\Projects\FollowUpAI
+rootdir: <project>
 configfile: pytest.ini
 plugins: anyio-4.15.1, logfire-5.1.1, platformdirs-4.12.3
-collected 3 items                       
+collected 3 items
 
 tests\test_retry.py ...           [100%]
 
 ========== 3 passed in 5.57s ===========
+```
+
+---
 
 ## F. Approving an item that still has an open question
 
@@ -520,7 +530,7 @@ kept `needs_clarification: true` and `owner: null`, so no owner was invented. Th
 were not saved.
 
 How this recording was made: the review answers were piped into the program from a list, so the run is repeatable.
-The answers are not echoed on screen. The answers, in order, were:
+The answers are not echoed on screen. The on-screen draft is the same kind of output as in B, so only the result of the review (the saved record) is shown below. The answers, in order, were:
 
 | Item | Answers |
 | --- | --- |
@@ -532,7 +542,7 @@ The answers are not echoed on screen. The answers, in order, were:
 
 ```
 PS> "s","s","a","y","","a","y","Owner will be chosen at the next meeting","s","" | python -m src.main samples\example_pdf.md --date 2026-10-06
-<paste the screen output of the python command here>
+(draft summary and review prompts omitted here; the draft has the same structure as in B)
 PS> Get-Content output\approved_actions.json
 [
   {
@@ -576,6 +586,8 @@ PS> Get-Content output\approved_actions.json
 - Contradictions are listed, not resolved (C).
 - Only approved actions are saved (A, B). Decisions and open questions are never saved.
 - File and model failures end with a clear message and exit code 1 (D).
+- A busy model service is retried automatically, and a wrong model name fails at once (E).
+- Approving an item that still has an open question needs a typed reason, which is saved as `approval_note` (F).
 
 ## Possible improvements
 
