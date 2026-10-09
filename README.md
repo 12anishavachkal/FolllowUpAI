@@ -33,7 +33,7 @@ The agent reads fictional meeting notes and prepares a draft follow-up package:
 | Google Gemini (model set in `.env`) | Available with a free tier |
 | Pydantic models | The output has a defined shape; owners and deadlines are optional so they are never forced |
 | python-dotenv, PyYAML | Secrets in `.env`, settings in `config/settings.yaml`, rules in `config/system_prompt.md` |
-| pytest | 43 fast tests without the model, plus 3 optional live tests |
+| pytest | 53 fast tests without the model, plus 3 optional live tests |
 
 Design principle: a small, well-tested solution. One agent, two tools, three safety layers, two human approval points.
 It is deliberately not a multi-agent system.
@@ -92,7 +92,7 @@ python -m src.main samples\example_pdf.md --date 2026-10-06
 
 Review keys: `a` approve, `r` reject, `m` modify, `c` complete owner or deadline, `s` skip, `q` finish.
 Typed owners are checked against `config/team.json`. Typed deadlines must be exact dates (for example 2026-11-15).
-Items that still have an open question need an extra confirmation to approve.
+Items that still have an open question need an extra confirmation and a typed reason to approve.
 
 Sample notes are in `samples/`: `clear_notes.md`, `example_pdf.md` (the assignment's own example),
 `contradictory_notes.md`, plus `empty_notes.md` and `wrong_type.docx` for failure cases.
@@ -100,7 +100,7 @@ Sample notes are in `samples/`: `clear_notes.md`, `example_pdf.md` (the assignme
 ## 6. Tests
 
 ```
-python -m pytest                  # 43 tests, no API calls
+python -m pytest                  # 53 tests, no API calls
 $env:RUN_LLM_TESTS = "1"          # enable the 3 live-model tests (they call Gemini)
 python -m pytest tests\test_llm_live.py
 ```
@@ -121,8 +121,12 @@ output/        approved_actions.json is created here (git-ignored)
 
 ## 8. Known limitations
 
-- The model can still misread language. The guardrails catch ambiguous or unknown people, invented quotes and
-  bad dates, but they cannot tell that "Tom suggested it" does not make Tom the owner. The human review exists for this.
+- The model can still misread language. The guardrails flag a "confirmed" item whose quote sounds hedged
+  ("probably", "could", "suggested") and remove an owner who only suggested or asked something. These are
+  word-pattern checks, so they reduce but do not remove the risk of a wrong classification or owner. The human
+  review is the final safeguard.
+  - A reviewer can approve an item that still has an open question, but must type a reason. The reason is saved as
+  `approval_note` and the record keeps `needs_clarification: true`.
 - English text notes only, one file per run, JSON output only.
 - The action writer appends on every run, so running the same notes twice saves duplicate records.
 - Editing a deadline during review does not update a date mentioned in the description (owner edits do).

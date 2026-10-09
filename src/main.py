@@ -61,6 +61,14 @@ def main() -> int:
         print("Nothing to save.")
         return 0
 
+    overridden = [i for i in to_save if i.needs_clarification]
+    if overridden:
+        print("\nApproved with an open question (will be saved with your reason):")
+        for i in overridden:
+            print(f"  [{i.id}] {i.title}\n      Open: {i.clarification_question}"
+                  f"\n      Reason: {i.approval_note}")
+
+    
     output_path = resolve_path(load_settings()["paths"]["output_file"])
     if not ask_yes_no(input, f"Save {len(to_save)} approved item(s) to {output_path}? [Y/n]: ",
                       default=True):

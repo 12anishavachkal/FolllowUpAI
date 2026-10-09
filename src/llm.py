@@ -8,7 +8,7 @@ from pydantic_ai.providers.google import GoogleProvider
 
 load_dotenv()  # reads the local .env file (never committed)
 
-DEFAULT_MODEL = "LLM_MODEL=gemini-3.5-flash-lite"
+DEFAULT_MODEL = "gemini-3.5-flash-lite"
 
 
 class LLMConfigError(Exception):

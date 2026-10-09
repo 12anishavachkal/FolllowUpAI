@@ -82,6 +82,10 @@ class MeetingItem(BaseModel):
     was_modified: bool = Field(
         default=False, description="True if the human edited this item during review."
     )
+    approval_note: Optional[str] = Field(
+        default=None,
+        description="Reason the human gave for approving an item that still had an open question.",
+    )
 
     @model_validator(mode="after")
     def check_consistency(self) -> "MeetingItem":

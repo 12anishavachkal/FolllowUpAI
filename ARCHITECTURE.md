@@ -45,7 +45,8 @@ flowchart TD
 ## Human approval points
 
 1. **Item review.** Every item is approved, rejected, modified, completed or skipped. Items with an open
-   question need an extra confirmation to approve. End of input approves nothing.
+   question need an extra confirmation and a typed reason (saved as `approval_note`) to approve. End of input
+   approves nothing.
 2. **Final save confirmation.** "Save N approved item(s)?" Only approved items of the saveable types are written.
 
 ## Safety layers
@@ -53,7 +54,9 @@ flowchart TD
 1. **Instructions:** the system prompt forbids invented owners and dates and treats the notes as data.
 2. **Tools:** dates and people come from code, not from the model's guess.
 3. **Guardrails:** every item is reset to pending, quoted evidence must appear in the notes, owners must be in
-   the notes and pass the person validator, deadlines are re-validated. Every correction is logged and shown.
+   the notes and pass the person validator, deadlines are re-validated. Hedged wording on "confirmed" items is
+   flagged, owners who only suggested or asked something are removed, and every item quoted inside a reported
+   contradiction is flagged. Every correction is logged and shown.
 
 ## Error handling
 

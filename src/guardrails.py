@@ -15,6 +15,17 @@ from src.models import DeadlineStatus, ItemType, MeetingAnalysis, MeetingItem, R
 from src.tools.date_validator import validate_deadline
 from src.tools.person_validator import validate_person
 
+# Wording that signals "not agreed". A confirmed item whose own quote contains one of
+# these is flagged (not re-typed: the human decides).
+HEDGE_PATTERN = re.compile(
+    r"\b(probably|maybe|perhaps|possibly|might|could|should consider|should probably|"
+    r"suggest(?:ed|s)?|propos(?:ed|es?)|recommend(?:ed|s)?|wonder(?:ed|s)?|not sure|"
+    r"tentative(?:ly)?)\b", re.IGNORECASE)
+# The person only voiced an idea: "Laura suggested ...", "Tom asked whether ..."
+IDEA_VERBS = (r"(?:suggest(?:ed|s)?|propos(?:ed|es?)|recommend(?:ed|s)?|ask(?:ed|s)?|"
+              r"wonder(?:ed|s)?|mention(?:ed|s)?|raise[ds]?|ask(?:ed)? whether|thought)")
+CONFIRMED_TYPES = (ItemType.CONFIRMED_DECISION, ItemType.CONFIRMED_ACTION)
+
 
 def _words(text: str) -> str:
     """Lowercase, drop punctuation and markdown, collapse spaces (forgiving comparison)."""
@@ -112,6 +123,47 @@ def _check_deadline(item: MeetingItem, label: str, notes_flat: str,
                    f"(now {item.deadline_status.value}).")
 
 
+def _check_hedging(item: MeetingItem, label: str, log: list[str]) -> None:
+    """A 'confirmed' item whose quote sounds hedged must be confirmed by a human."""
+    if item.type not in CONFIRMED_TYPES:
+        return
+    hit = HEDGE_PATTERN.search(item.supporting_text)
+    if hit:
+        _flag(item, f"The notes say '{hit.group(0)}', which sounds undecided. "
+                    "Was this really agreed?")
+        log.append(f"{label}: marked '{item.type.value}' but the quote contains "
+                   f"'{hit.group(0)}'; flagged for confirmation.")
+
+
+def _check_idea_only_owner(item: MeetingItem, label: str, log: list[str]) -> None:
+    """Remove an owner who only appears as the person who suggested or asked."""
+    if not item.owner:
+        return
+    names = {item.owner.lower(), *item.owner.lower().split()}
+    quote = item.supporting_text
+    for name in names:
+        if re.search(rf"\b{re.escape(name)}\b\s+{IDEA_VERBS}\b", quote, re.IGNORECASE):
+            if re.search(rf"\b{re.escape(name)}\b.*?\b(?:will|agreed to|is going to|"
+                         rf"takes?|owns?|volunteer(?:ed|s)?)\b", quote, re.IGNORECASE):
+                return  # the same quote also gives them the task
+            written, item.owner = item.owner, None
+            _flag(item, f"{written} only suggested or raised this. Who is responsible?")
+            log.append(f"{label}: owner '{written}' only suggested or asked in the quote; removed.")
+            return
+
+
+def _flag_contradictions(analysis: MeetingAnalysis, log: list[str]) -> None:
+    """Items quoted inside a reported contradiction must be flagged, whatever the model did."""
+    for text in analysis.contradictions:
+        flat = _words(text)
+        for number, item in enumerate(analysis.items, start=1):
+            quote = _words(item.supporting_text)
+            if quote and quote in flat and not item.needs_clarification:
+                _flag(item, "This statement contradicts another part of the notes. "
+                            "Which version is correct?")
+                log.append(f"item-{number}: part of a contradiction; flagged.")
+
+
 def apply_guardrails(analysis: MeetingAnalysis, notes_text: str,
                      meeting_date: str) -> tuple[MeetingAnalysis, list[str]]:
     """Correct the model's output in place. Returns (analysis, list of corrections)."""
@@ -133,11 +185,13 @@ def apply_guardrails(analysis: MeetingAnalysis, notes_text: str,
                         "Please check this item against the original notes.")
             log.append(f"{label}: supporting text is not word for word in the notes; flagged.")
 
-
+        _check_hedging(item, label, log)
         _check_owner(item, label, notes_flat, notes_vocab, log)
+        _check_idea_only_owner(item, label, log)
         _check_deadline(item, label, notes_flat, meeting_date, log)
 
         if item.type == ItemType.CONFIRMED_ACTION and not item.owner:
             _flag(item, "Who should own this action?")
 
+    _flag_contradictions(analysis, log)
     return analysis, log

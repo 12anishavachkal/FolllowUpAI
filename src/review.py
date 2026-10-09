@@ -182,9 +182,16 @@ def review_items(items: list[MeetingItem], meeting_date: str,
             choice = _ask(ask, f"{MENU}\n> ").lower()
 
             if choice == "a":
-                if item.needs_clarification and not ask_yes_no(
-                        ask, "  This item still has an open question. Approve anyway? [y/N]: "):
-                    continue
+                if item.needs_clarification:
+                    if not ask_yes_no(
+                            ask, "  This item still has an open question. Approve anyway? [y/N]: "):
+                        continue
+                    reason = _ask(ask, "  Reason for approving with the open question "
+                                       "(required, Enter = cancel): ")
+                    if not reason:
+                        show("  No reason given. Not approved.")
+                        continue
+                    item.approval_note = reason
                 item.status = ReviewStatus.APPROVED
                 show("  -> approved")
                 break

@@ -18,8 +18,9 @@ text, one meeting per file. "Next month" can only become a date with a human's h
 open questions are reviewed, but only actions are written to the output file.
 
 ## What is most likely to fail?
-- The model treating the person who suggested something as the owner. Code cannot detect this, so the human
-  review is the safety net.
+- The model treating the person who suggested something as the owner. A guardrail now removes an owner when the
+  quote shows they only suggested or asked, but it is a word pattern, so unusual phrasing can slip through.
+  Human review remains the safety net.
 - The model putting text that is not a time into the deadline field. This happened once (it wrote "no owner was
   selected" as a deadline). I added a prompt rule, and the human review catches the rest.
 - Model names being retired (I hit a 404) and an overloaded service (I hit repeated 503 errors). Both are handled,
@@ -27,8 +28,9 @@ open questions are reviewed, but only actions are written to the output file.
 - Very long notes or subtle wording such as "we'll probably".
 
 ## How was behaviour verified?
-- 43 automatic tests without the model: dates, people, guardrails (fed deliberately wrong "model output"),
+- 53 automatic tests without the model: dates, people, guardrails (fed deliberately wrong "model output"),
   the review loop with scripted answers, saving, and file failures including the command-line exit code.
+  Contradiction handling is also tested without the model, using a fake model answer.
 - 3 live tests with the real model that check rules, not exact wording. They passed.
 - Manual demonstrations with recorded terminal output (docs/DEMO.md): clear notes, the assignment's ambiguous example, contradictory notes,
   and several failures (missing, empty and wrong-type files, a wrong model name, a busy service).

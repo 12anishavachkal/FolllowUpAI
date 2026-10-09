@@ -2,7 +2,7 @@
 
 Agent: Project Meeting Follow-up Agent (PydanticAI + Gemini)
 Model used: `gemini-3.5-flash-lite` (pydantic-ai 2.54.0, Python 3.12.5)
-Meeting date used for all runs: `2026-10-06` (passed with `--date`)
+Meeting date used for all runs: `2026-10-06` (passed with `--date`)Recorded: 2026-10-09
 Recorded: 2026-10-08
 Setup: see the README. All meeting notes are synthetic and live in `samples/`.
 Paths in the recordings are shortened to `<project>\`.
@@ -13,6 +13,7 @@ Paths in the recordings are shortened to `<project>\`.
 | B | Ambiguous notes, human completes an item | `example_pdf.md` | One ambiguous or incomplete interaction |
 | C | Contradictory notes | `contradictory_notes.md` | Contradictory information |
 | D | Missing, empty and wrong-type file, bad model name | several | One failure scenario |
+| F | Approving over an open question | `example_pdf.md` | Human approval with a recorded reason |
 
 ---
 
@@ -507,6 +508,53 @@ collected 3 items
 tests\test_retry.py ...           [100%]
 
 ========== 3 passed in 5.57s ===========
+
+## F. Approving an item that still has an open question
+
+Command: `python -m src.main samples\example_pdf.md --date 2026-10-06`
+
+What happened: The reviewer approved "Prepare example project data" while its owner was still unknown. Approving
+an item with an open question needs an extra confirmation and a typed reason. An empty reason was refused and the
+item was shown again. After a reason was given, the item was approved and saved with `approval_note`. The record
+kept `needs_clarification: true` and `owner: null`, so no owner was invented. The other items stayed pending and
+were not saved.
+
+How this recording was made: the review answers were piped into the program from a list, so the run is repeatable.
+The answers are not echoed on screen. The answers, in order, were:
+
+| Item | Answers |
+| --- | --- |
+| 1. Test with project managers | `s` (skip) |
+| 2. Timing of the first test | `s` (skip) |
+| 3. Prepare example project data | `a` (approve), `y` (approve anyway), Enter (empty reason, refused), `a`, `y`, then the reason `Owner will be chosen at the next meeting` |
+| 4. External user access | `s` (skip) |
+| Save prompt | Enter (yes) |
+
+```
+PS> "s","s","a","y","","a","y","Owner will be chosen at the next meeting","s","" | python -m src.main samples\example_pdf.md --date 2026-10-06
+<paste the screen output of the python command here>
+PS> Get-Content output\approved_actions.json
+[
+  {
+    "id": "item-3",
+    "type": "confirmed_action",
+    "title": "Prepare example project data",
+    "description": "The team agreed to prepare example project data, but no owner was selected.",
+    "owner": null,
+    "deadline_raw": null,
+    "deadline_date": null,
+    "deadline_status": "none",
+    "supporting_text": "The team agreed to prepare example project data, but no owner was selected.",
+    "needs_clarification": true,
+    "clarification_question": "Who should be responsible for preparing example project data? Who should own this action?",
+    "status": "approved",
+    "was_modified": false,
+    "approval_note": "Owner will be chosen at the next meeting",
+    "source_file": "example_pdf.md",
+    "saved_at": "2026-10-09T07:21:55.147303+00:00"
+  }
+]
+```
 
 ---
 
