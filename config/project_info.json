@@ -1,0 +1,12 @@
+{
+  "facts": [
+    {"topic": "reporting view", "keywords": ["reporting", "view", "report", "spreadsheet"],
+     "fact": "The reporting view replaces the old spreadsheet reports."},
+    {"topic": "export bug", "keywords": ["export", "bug", "csv"],
+     "fact": "The export bug affects CSV downloads in the reporting view."},
+    {"topic": "test group", "keywords": ["test", "testing", "managers", "invitation"],
+     "fact": "The first test group consists of the project managers."},
+    {"topic": "external users", "keywords": ["external", "access", "users"],
+     "fact": "No decision on external-user access has been recorded in the project documents."}
+  ]
+}

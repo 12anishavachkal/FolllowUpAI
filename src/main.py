@@ -80,7 +80,9 @@ def main() -> int:
     except ActionWriteError as exc:
         print(f"Could not save: {exc}")
         return 1
-    print(f"Saved {saved} approved item(s) to {output_path}.")
+    print(f"Saved {saved} new approved item(s) to {output_path}.")
+    if saved < len(to_save):
+        print(f"{len(to_save) - saved} item(s) were already saved earlier and were skipped.")
     return 0
 
 

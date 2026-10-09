@@ -109,3 +109,12 @@ def test_changing_owner_updates_old_name_in_description_but_not_quote():
     assert "Tom" not in item.title and "Tom" not in item.description
     assert "Priya Nair" in item.description
     assert item.supporting_text == "Tom will write the report."  # original quote kept
+
+def test_same_approved_item_is_not_saved_twice(tmp_path):
+    out = tmp_path / "o.json"
+    item = make("item-1", "confirmed_action", "Write report", owner="Tom Becker",
+                status="approved")
+    assert save_approved_actions([item], str(out), "notes.md") == 1
+    assert save_approved_actions([item], str(out), "notes.md") == 0   # duplicate skipped
+    assert len(json.loads(out.read_text(encoding="utf-8"))) == 1
+    assert save_approved_actions([item], str(out), "other.md") == 1   # other source is new

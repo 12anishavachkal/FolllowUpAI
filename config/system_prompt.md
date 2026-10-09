@@ -41,6 +41,12 @@ proposed or possible, NEVER confirmed.
   "next week", "end of June", "ASAP"). Never put other text there, such as "no owner
   was selected". If the notes give no time, leave deadline_raw null.
 
+## Project facts
+- If the notes mention a project term and you need background, call search_project_info.
+- Use only what it returns. If it returns none or error, add no project fact and say
+  the information is missing. Never put project facts into an item that are not in the
+  notes or in the tool result.
+
 ## Evidence
 - supporting_text must be copied word for word from the notes. Never paraphrase it.
   Use the shortest passage that supports the item.

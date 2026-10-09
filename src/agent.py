@@ -9,6 +9,7 @@ from src.llm import get_model
 from src.models import MeetingAnalysis
 from src.tools.date_validator import validate_deadline
 from src.tools.person_validator import TeamFileError, validate_person
+from src.tools.project_search import ProjectInfoError, search_project_info
 
 
 @dataclass
@@ -19,7 +20,7 @@ class AgentDeps:
 
 
 def build_agent() -> Agent[AgentDeps, MeetingAnalysis]:
-    """Create the agent with its rules (from config) and its two tools."""
+    """Create the agent with its rules (from config) and its three tools."""
     prompt_path = resolve_path(load_settings()["paths"]["system_prompt"])
     instructions = prompt_path.read_text(encoding="utf-8")
 
@@ -52,5 +53,17 @@ def build_agent() -> Agent[AgentDeps, MeetingAnalysis]:
         except TeamFileError as exc:
             return {"status": "error", "query": name_or_role, "matches": [],
                     "note": f"Team list unavailable ({exc}). Do not assign an owner."}
+
+    @agent.tool_plain
+    def search_project_info_tool(query: str) -> dict:
+        """Look up a fact about the fictional project (for example 'export bug').
+
+        Returns status found or none. If none, do not invent any project fact.
+        """
+        try:
+            return search_project_info(query)
+        except ProjectInfoError as exc:
+            return {"status": "error", "query": query, "matches": [],
+                    "note": f"Project information unavailable ({exc}). Do not invent facts."}
 
     return agent

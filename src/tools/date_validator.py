@@ -69,8 +69,10 @@ def validate_deadline(raw_text: str, meeting_date: str) -> dict:
     if match:
         target = WEEKDAYS.index(match.group(1))
         days_ahead = (target - today.weekday() - 1) % 7 + 1
-        return _result("needs_clarification",
-                       candidate_range=(today + timedelta(days=days_ahead),) * 2,
+        first = today + timedelta(days=days_ahead)
+        # "next Friday" can mean the nearest Friday or the one after: give both.
+        last = first + timedelta(days=7) if "next " in lowered else first
+        return _result("needs_clarification", candidate_range=(first, last),
                        note="A weekday name is ambiguous. Confirm the exact date.")
 
     return _result("needs_clarification", note=f"Could not understand deadline '{raw_text}'.")

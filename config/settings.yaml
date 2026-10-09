@@ -1,5 +1,6 @@
 paths:
   team_file: config/team.json
+  project_info_file: config/project_info.json
   output_file: output/approved_actions.json
   system_prompt: config/system_prompt.md
 

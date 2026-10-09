@@ -46,3 +46,8 @@ def test_empty_text_means_no_deadline():
 
 def test_bad_meeting_date_is_an_error():
     assert validate_deadline("2026-11-15", "06/10/2026")["status"] == "error"
+
+def test_next_friday_gives_both_possible_dates():
+    result = validate_deadline("next Friday", MEETING)   # 2026-10-06 is a Tuesday
+    assert result["status"] == "needs_clarification" and result["date"] is None
+    assert result["candidate_range"] == ["2026-10-09", "2026-10-16"]

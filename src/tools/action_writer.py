@@ -22,8 +22,20 @@ def saveable_types() -> set[str]:
     return set(configured) if configured else {t.value for t in ItemType}
 
 
+DUPLICATE_KEY_FIELDS = ("source_file", "type", "title", "owner", "deadline_date",
+                        "supporting_text")
+
+
+def _duplicate_key(record: dict) -> tuple:
+    """Identify a record by its content, ignoring status and save time."""
+    return tuple(record.get(field) for field in DUPLICATE_KEY_FIELDS)
+
+
 def save_approved_actions(items: list[MeetingItem], output_path: str, source_name: str) -> int:
-    """Append approved items of a saveable type to the JSON file; return how many were saved.
+    """Append approved items of a saveable type to the JSON file; return how many were NEW.
+
+    An item already in the file (same source, type, title, owner, deadline and quote)
+    is skipped, so running the same notes twice does not create duplicates.
 
     Items that are pending, rejected or of another type are filtered out here as a
     second safety net, even if the caller already filtered them.
@@ -45,11 +57,20 @@ def save_approved_actions(items: list[MeetingItem], output_path: str, source_nam
             raise ActionWriteError("Existing output file has an unexpected format.")
 
     saved_at = datetime.now(timezone.utc).isoformat()
+    known = {_duplicate_key(r) for r in existing if isinstance(r, dict)}
+    new_count = 0
     for item in approved:
         record = item.model_dump(mode="json")
         record["source_file"] = source_name
         record["saved_at"] = saved_at
+        if _duplicate_key(record) in known:
+            continue
+        known.add(_duplicate_key(record))
         existing.append(record)
+        new_count += 1
+
+    if new_count == 0:
+        return 0
 
     try:
         path.parent.mkdir(parents=True, exist_ok=True)

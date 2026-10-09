@@ -26,8 +26,10 @@ def _deadline_text(item: MeetingItem) -> str:
 def render_item(item: MeetingItem) -> str:
     """Format one item as indented plain text."""
     lines = [f"  [{item.id}] {item.title}", f"      {item.description}"]
-    if item.type in ACTION_TYPES or item.owner or item.deadline_raw:
+    is_action = item.type in ACTION_TYPES
+    if is_action or item.owner:
         lines.append(f"      Owner: {item.owner or 'NOT ASSIGNED'}")
+    if is_action or item.deadline_raw:
         lines.append(f"      Deadline: {_deadline_text(item)}")
     lines.append(f'      Source: "{item.supporting_text}"')
     if item.needs_clarification:
