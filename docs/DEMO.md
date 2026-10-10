@@ -15,6 +15,7 @@ Paths in the recordings are shortened to `<project>\`.
 | D | Missing, empty and wrong-type file, bad model name | several | One failure scenario |
 | E | Busy service (simulated with tests) | `tests\test_retry.py` | Technical failure with automatic retry |
 | F | Approving over an open question | `example_pdf.md` | Human approval with a recorded reason |
+| G | Risks and concerns | `risk_notes.md` | Identifying risks and concerns |
 
 ---
 
@@ -521,6 +522,8 @@ tests\test_retry.py ...           [100%]
 
 ## F. Approving an item that still has an open question
 
+
+
 Command: `python -m src.main samples\example_pdf.md --date 2026-10-06`
 
 What happened: The reviewer approved "Prepare example project data" while its owner was still unknown. Approving
@@ -566,6 +569,63 @@ PS> Get-Content output\approved_actions.json
 ]
 ```
 
+---
+
+## G. Risks and concerns
+
+Command: `python -m src.main samples\risk_notes.md --date 2026-10-06 --no-review`
+
+What to check in the output (write the "What happened" line after you run it):
+- "We are worried that the export bug could delay the first test" and "There is a risk that the project managers are not available in November" appear under RISKS AND CONCERNS, not as actions.
+- "Tom Becker will fix the export bug by 2026-10-16" is a confirmed action with owner Tom Becker and a resolved date.
+- "The team agreed to prepare example project data, but no owner was selected" is a confirmed action with owner NOT ASSIGNED and a clarification question.
+- Nothing is saved (`--no-review`).
+
+What happened: The agent kept the two risks (export bug delaying the test, project managers unavailable in November) as risks, not actions. Tom Becker's action kept its owner and the exact date 2026-10-16. "Prepare example project data" has no owner and a clarification question, so 1 of 4 items needed clarification. The model wrote the text "null" as a deadline for three items, and the guardrails removed it and logged each correction. Review was skipped, so nothing was saved.
+
+```
+PS> python -m src.main samples\risk_notes.md --date 2026-10-06 --no-review
+```
+PS> python -m src.main samples\risk_notes.md --date 2026-10-06 --no-review
+MEETING FOLLOW-UP (DRAFT - nothing has been saved)
+============================================================
+Meeting: Reporting View - Risk Review
+
+SUMMARY
+The team discussed the reporting view and noted that Tom Becker will fix the export bug by 2026-10-16. Risks were raised regarding potential test delays caused by the export bug and the availability of project managers in November. Additionally, the team agreed to prepare example project data, though an owner still needs to be assigned.
+Topics: Reporting View; Export Bug; Project Managers; Project Data
+
+CONFIRMED ACTIONS (2)
+  [item-1] Fix export bug
+      Tom Becker will fix the export bug affecting CSV downloads in the reporting view.
+      Owner: Tom Becker
+      Deadline: 2026-10-16 (notes say '2026-10-16')
+      Source: "Tom Becker will fix the export bug by 2026-10-16."
+  [item-3] Prepare example project data
+      The team agreed to prepare example project data, but no owner was selected yet.
+      Owner: NOT ASSIGNED
+      Deadline: none mentioned
+      Source: "The team agreed to prepare example project data, but no owner was selected."
+      [!] Clarify: Who should own preparing the example project data? Who should own this action?
+
+RISKS AND CONCERNS (2)
+  [item-2] Export bug test delay risk
+      Concern that the export bug could delay the first test with the project managers.
+      Source: "We are worried that the export bug could delay the first test with the project managers."
+  [item-4] Project manager availability in November
+      Risk that the project managers might not be available in November.
+      Source: "There is a risk that the project managers are not available in November."
+
+1 of 4 items need clarification.
+
+AUTOMATIC CHECKS (corrections made after the model answered)
+  - item-2: deadline wording 'null' not found in the notes; removed.
+  - item-3: deadline wording 'null' not found in the notes; removed.
+  - item-4: deadline wording 'null' not found in the notes; removed.
+
+Review skipped (--no-review). Nothing was saved.
+
+```
 ---
 
 ## Agent decision flow

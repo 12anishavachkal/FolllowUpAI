@@ -26,12 +26,12 @@ The agent reads fictional meeting notes and prepares a draft follow-up package:
 
 | Choice | Why |
 |---|---|
-| Python 3.12 (developed on 3.12.5) | Required by the assignment |
+| Python 3.12 (developed on 3.12.5) | The assignment requires Python; 3.12 is the version I developed and tested on |
 | PydanticAI | Typed structured output and simple tool registration; fits a small, verifiable design |
 | Google Gemini (model set in `.env`) | Available with a free tier |
 | Pydantic models | The output has a defined shape; owners and deadlines are optional so they are never forced |
 | python-dotenv, PyYAML | Secrets in `.env`, settings in `config/settings.yaml`, rules in `config/system_prompt.md` |
-| pytest | 61 fast tests without the model, plus 3 optional live tests |
+| pytest | 62 fast tests without the model, plus 3 optional live tests |
 
 Design principle: a small, well-tested solution. One agent, three agent tools (date, person, project-info search), three safety layers, two human approval points.
 It is deliberately not a multi-agent system.
@@ -93,12 +93,12 @@ Typed owners are checked against `config/team.json`. Typed deadlines must be exa
 Items that still have an open question need an extra confirmation and a typed reason to approve.
 
 Sample notes are in `samples/`: `clear_notes.md`, `example_pdf.md` (the assignment's own example),
-`contradictory_notes.md`, `risk_notes.md` (risks and concerns), plus `empty_notes.md` and `wrong_type.docx` for failure cases.
+`contradictory_notes.md`, `risk_notes.md` (risks and concerns, see demo G), plus `empty_notes.md` and `wrong_type.docx` for failure cases.
 
 ## 6. Tests
 
 ```
-python -m pytest                  # 61 tests, no API calls
+python -m pytest                  # 62 tests, no API calls
 $env:RUN_LLM_TESTS = "1"          # enable the 3 live-model tests (they call Gemini)
 python -m pytest tests\test_llm_live.py
 ```
@@ -126,6 +126,7 @@ output/        approved_actions.json is created here (git-ignored)
   - A reviewer can approve an item that still has an open question, but must type a reason. The reason is saved as
   `approval_note` and the record keeps `needs_clarification: true`.
 - English text notes only, one file per run, JSON output only.
+- The meeting date is not read from the notes. It comes from `--date` (default: today), so for an older meeting pass `--date`, otherwise relative wording such as "next month" is checked against the wrong date.
 - The action writer skips records that were already saved (same source, type, title, owner, deadline and quote), so running the same notes twice does not create duplicates.
 - Editing a deadline during review does not update a date mentioned in the description (owner edits do).
 - The team list and the project-information file (`config/project_info.json`) are fictional and small.
