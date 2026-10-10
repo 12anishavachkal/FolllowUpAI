@@ -586,8 +586,6 @@ What happened: The agent kept the two risks (export bug delaying the test, proje
 ```
 PS> python -m src.main samples\risk_notes.md --date 2026-10-06 --no-review
 ```
-PS> python -m src.main samples\risk_notes.md --date 2026-10-06 --no-review
-MEETING FOLLOW-UP (DRAFT - nothing has been saved)
 ============================================================
 Meeting: Reporting View - Risk Review
 
