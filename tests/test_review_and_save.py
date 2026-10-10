@@ -118,3 +118,14 @@ def test_same_approved_item_is_not_saved_twice(tmp_path):
     assert save_approved_actions([item], str(out), "notes.md") == 0   # duplicate skipped
     assert len(json.loads(out.read_text(encoding="utf-8"))) == 1
     assert save_approved_actions([item], str(out), "other.md") == 1   # other source is new
+
+
+def test_save_returns_only_new_count_when_some_are_duplicates(tmp_path):
+    """Regression: a mix of already-saved and new items must report only the new ones."""
+    out = tmp_path / "o.json"
+    first = make("a", "confirmed_action", "A", status="approved")
+    assert save_approved_actions([first], str(out), "t.md") == 1
+    again = make("a", "confirmed_action", "A", status="approved")
+    fresh = make("b", "confirmed_action", "B", status="approved")
+    assert save_approved_actions([again, fresh], str(out), "t.md") == 1
+    assert len(json.loads(out.read_text(encoding="utf-8"))) == 2

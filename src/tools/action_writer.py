@@ -80,4 +80,4 @@ def save_approved_actions(items: list[MeetingItem], output_path: str, source_nam
     except OSError as exc:
         raise ActionWriteError(f"Could not write output file: {exc}") from exc
 
-    return len(approved)
+    return new_count

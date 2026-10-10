@@ -2,7 +2,7 @@
 
 ## Overview
 
-One agent, two tools, three safety layers and two human approval points. The agent proposes, code verifies,
+One agent, three agent tools, three safety layers and two human approval points. The agent proposes, code verifies,
 and a human decides.
 
 ## Diagram
@@ -16,6 +16,7 @@ flowchart TD
     A --> G["Gemini agent (PydanticAI) with system_prompt.md"]
     G <--> T1["check_deadline tool: date_validator"]
     G <--> T2["check_person tool: person_validator and team.json"]
+    G <--> T3["search_project_info tool: project_search and project_info.json"]
     G --> O["MeetingAnalysis: typed output"]
     O --> GR["Guardrails: re-check in code"]
     GR --> S["Readable summary and optional JSON"]
@@ -35,6 +36,7 @@ flowchart TD
 | Tool: note reader | `src/tools/note_reader.py` | Safe file reading with clear errors |
 | Tool: date validator | `src/tools/date_validator.py` | Exact dates resolve; vague wording never does |
 | Tool: person validator | `src/tools/person_validator.py`, `config/team.json` | Found, ambiguous, role or unknown |
+| Tool: project-info search | `src/tools/project_search.py`, `config/project_info.json` | Returns fictional project facts or "none"; the agent must not invent facts |
 | Tool: summary generator | `src/tools/summary.py` | Readable follow-up summary |
 | Tool: action writer | `src/tools/action_writer.py` | Writes approved items of the saveable types, atomically |
 | Guardrails | `src/guardrails.py` | Deterministic checks after the model answers |
@@ -68,6 +70,7 @@ flowchart TD
 | Busy service (429, 5xx) | Automatic retries, then a clear message |
 | Wrong model name or key | Fails immediately with the provider's message |
 | Team file unavailable | The person tool reports an error; no owner is assigned |
+| Project-info file unavailable | The search tool reports an error; no project fact is added |
 | Output file unreadable | Save stops with a clear message; nothing is overwritten |
 
 ## Configuration

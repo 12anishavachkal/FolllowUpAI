@@ -28,7 +28,7 @@ open questions are reviewed, but only actions are written to the output file.
 - Very long notes or subtle wording such as "we'll probably".
 
 ## How was behaviour verified?
-- 53 automatic tests without the model: dates, people, guardrails (fed deliberately wrong "model output"),
+- 61 automatic tests without the model: dates, people, guardrails (fed deliberately wrong "model output"),
   the review loop with scripted answers, saving, and file failures including the command-line exit code.
   Contradiction handling is also tested without the model, using a fake model answer.
 - 3 live tests with the real model that check rules, not exact wording. They passed.

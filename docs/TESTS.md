@@ -12,7 +12,7 @@ The older `tests/check_*.py` scripts are manual smoke checks (run with `python -
 ## Test data
 
 All data is synthetic: `samples/clear_notes.md`, `samples/example_pdf.md` (the assignment's own
-fictional example), `samples/contradictory_notes.md`, `samples/empty_notes.md`,
+fictional example), `samples/contradictory_notes.md`, `samples/risk_notes.md`, `samples/empty_notes.md`,
 `samples/wrong_type.docx`, `config/team.json` (fictional team with two people named Laura),
 plus small inline notes, fake model answers and temporary files created inside the tests
 (see `tests/test_limits.py`).
@@ -33,6 +33,7 @@ plus small inline notes, fake model answers and temporary files created inside t
 | 10 | Hedged wording and idea-only owner | "probably" or "could" on a confirmed item is flagged. "Tom suggested…" does not make Tom the owner. "Tom suggested it and will do it" keeps Tom as owner | Reduces the risk of the model misclassifying decisions and owners |
 | 11 | Approve over an open question | Needs a typed reason. No reason means not approved. The reason is saved as `approval_note` | Makes overriding a warning deliberate and traceable |
 | 12 | Contradictions without the model | A contradiction is reported and quoted items are flagged, even if the model forgot (fake model answer) | The contradiction demo case, tested offline |
+| 13 | Duplicate-safe saving | Saving a mix of an already-saved and a new item reports only the new count; repeated saves never duplicate records | Keeps the saved file and the message to the user accurate |
 
 Deterministic parts (dates, people, guardrails, review, writer, files) are tested with ordinary
 unit tests. Model output varies, so live tests check rules and structure, not exact wording.

@@ -571,7 +571,7 @@ PS> Get-Content output\approved_actions.json
 ## Agent decision flow
 
 1. The note reader checks the file type, size, encoding and emptiness. A bad file stops the run with a clear message (case D).
-2. The agent reads the notes and may call two tools: `check_deadline` (validates dates; vague wording such as "next month" is never turned into a date) and `check_person` (checks the team list, including the two Lauras).
+2. The agent reads the notes and may call three tools: `check_deadline` (validates dates; vague wording such as "next month" is never turned into a date), `check_person` (checks the team list, including the two Lauras) and `search_project_info_tool` (looks up fictional project facts; if nothing is found, no fact is added).
 3. The model returns a typed `MeetingAnalysis`: topics, risks, owners, deadlines, contradictions and 8 item types (confirmed and proposed decisions, confirmed and possible actions, open questions, background, unclear).
 4. Guardrails re-check the model's answer in plain code: every quote must appear in the notes, an owner must appear in the notes and be unambiguous, dates are re-validated, and every item starts as pending. The model cannot approve anything.
 5. The user approves, rejects, modifies or completes each item. Approving an item that still has an open question needs a second confirmation. Nothing is approved automatically.
@@ -591,10 +591,8 @@ PS> Get-Content output\approved_actions.json
 
 ## Possible improvements
 
-- A fictional project-information search tool (currently a known limitation).
 - A web or UI review screen instead of the terminal.
 - CSV export and a merge across several meetings.
 - A cleaner alert when the model's output keeps failing validation.
 - A larger set of synthetic test notes in more formats.
-- The action writer appends on every run, so repeating a run creates duplicate records. It should skip duplicates.
 - Editing a deadline during review does not update a date written in the description text. Owner edits already do.
